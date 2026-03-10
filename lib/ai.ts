@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GeneratedOutput, PropertyFormData } from "@/types";
 
-export const GEMINI_MODEL = "gemini-flash-latest";
+export const GEMINI_MODEL = "gemini-flash-lite-latest"; 
 
 const getApiKey = (): string => {
   const apiKey = process.env.GEMINI_API_KEY;

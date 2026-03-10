@@ -4,6 +4,8 @@
 
 The tool helps real estate agents, property owners, and rental hosts quickly create high-quality listing descriptions ready for publication on property portals.
 
+### Descrify live app - http://descrify.xyz/
+
 ---
 
 ## Features
