@@ -1,0 +1,24 @@
+Failed to parse translation response: SyntaxError: Unexpected token '`', "```json
+{
+"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at parse (lib\ai.ts:273:24)
+    at async PUT (app\api\generate\route.ts:127:23)
+  271 |
+  272 |   try {
+> 273 |     const parsed = JSON.parse(text);
+      |                        ^
+  274 |     return {
+  275 |       seoTitle: String(parsed.seoTitle || data.seoTitle).slice(0, 72),
+  276 |       shortDescription: String(parsed.shortDescription || data.shortDescription),
+Translation error: Error: Failed to translate. Please try again.
+    at translateDescription (lib\ai.ts:288:10)
+    at async PUT (app\api\generate\route.ts:127:23)
+  286 |   } catch (error) {
+  287 |     console.error("Failed to parse translation response:", error);
+> 288 |     throw new Error("Failed to translate. Please try again.");
+      |          ^
+  289 |   }
+  290 | }
+  291 |
+ PUT /api/generate 500 in 10187ms
