@@ -29,7 +29,7 @@ KEY REQUIREMENTS:
 2. SEO title must be MAX 72 characters
 3. Short description: 2-3 sentences, catchy and informative
 4. Long description: 400-500 words, premium and persuasive
-5. NEVER invent amenities or features not provided by the user or visible in images
+5. NEVER invent amenities or features not provided by the user
 6. NEVER use generic AI phrases like "Welcome to this stunning property"
 7. Write in a premium, professional tone suitable for real estate portals
 8. Focus on lifestyle benefits and experience, not just facts
@@ -59,7 +59,6 @@ OUTPUT SCHEMA:
   "shortDescription": string (2-3 sentences),
   "longDescription": string (400-500 words),
   "listingVersion": string (variation label like "Elegant & Sophisticated" or "Cozy & Inviting"),
-  "detectedImageFeatures": string[] (features observed from images, empty if no images),
   "suggestedKeywords": string[] (SEO keywords for the listing)
 }
 
@@ -67,7 +66,7 @@ For vacation rentals: Emphasize guest experience, amenities for comfort, proximi
 For sale listings: Emphasize investment value, quality features, location benefits, and move-in readiness.`;
 };
 
-export const buildUserPrompt = (data: PropertyFormData, imageFeatures?: string[]): string => {
+export const buildUserPrompt = (data: PropertyFormData): string => {
   const {
     propertyType,
     listingType,
@@ -134,10 +133,6 @@ PROPERTY DETAILS:
     prompt += `\n- Additional details: ${additionalDetails}`;
   }
 
-  if (imageFeatures && imageFeatures.length > 0) {
-    prompt += `\n\nOBSERVED IMAGE FEATURES: ${imageFeatures.join(", ")}`;
-  }
-
   prompt += `\n\nNow generate the JSON output following the schema specified in your system prompt.`;
 
   return prompt;
@@ -167,28 +162,9 @@ export async function generateDescription(
     contents.push({
       role: "user",
       parts: [
-        { text: "Analyze these property images and note any visible features (pool, balcony, sea view, terrace, garden, modern interior, kitchen, outdoor area):" },
+        { text: buildUserPrompt(data) },
         ...imageParts,
       ],
-    });
-
-    const visionResult = await model.generateContent([
-      "List all visible features in these property images (pool, balcony, sea view, terrace, garden, modern interior, kitchen, outdoor area, etc.). Return as a comma-separated list.",
-      ...imageParts,
-    ]);
-
-    const visionResponse = await visionResult.response;
-    const imageFeaturesText = visionResponse.text() || "";
-    const imageFeatures = imageFeaturesText.split(",").map((f) => f.trim()).filter(Boolean);
-
-    contents.push({
-      role: "model",
-      parts: [{ text: `Detected features: ${imageFeatures.join(", ")}` }],
-    });
-
-    contents.push({
-      role: "user",
-      parts: [{ text: buildUserPrompt(data, imageFeatures) }],
     });
   } else {
     contents.push({
@@ -231,9 +207,7 @@ export async function generateDescription(
       shortDescription: String(parsed.shortDescription || ""),
       longDescription: String(parsed.longDescription || ""),
       listingVersion: String(parsed.listingVersion || "Standard"),
-      detectedImageFeatures: Array.isArray(parsed.detectedImageFeatures) 
-        ? parsed.detectedImageFeatures.map(String) 
-        : [],
+      detectedImageFeatures: [],
       suggestedKeywords: Array.isArray(parsed.suggestedKeywords)
         ? parsed.suggestedKeywords.map(String)
         : [],
@@ -289,9 +263,7 @@ Return the translated JSON with the same structure.`;
       shortDescription: String(parsed.shortDescription || data.shortDescription),
       longDescription: String(parsed.longDescription || data.longDescription),
       listingVersion: String(parsed.listingVersion || data.listingVersion),
-      detectedImageFeatures: Array.isArray(parsed.detectedImageFeatures) 
-        ? parsed.detectedImageFeatures.map(String) 
-        : data.detectedImageFeatures,
+      detectedImageFeatures: [],
       suggestedKeywords: Array.isArray(parsed.suggestedKeywords)
         ? parsed.suggestedKeywords.map(String)
         : data.suggestedKeywords,
