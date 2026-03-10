@@ -30,7 +30,7 @@ The AI generates structured content such as:
 - Suggested keywords
 - Image-detected features
 
-All content is generated based on the property details provided by the user.
+All content is generated based on the property details and images provided by the user.
 
 ---
 
